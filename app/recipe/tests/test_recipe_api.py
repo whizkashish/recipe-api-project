@@ -303,7 +303,7 @@ class PrivateRecipeApiTests(TestCase):
             ).exists()
             self.assertTrue(exists)
 
-    def tets_create_recipe_with_existing_ingredient(self):
+    def test_create_recipe_with_existing_ingredient(self):
         """Test creating a new recipe with existing ingredient"""
         ingredient = Ingredient.objects.create(user=self.user, name='Lemon')
         payload = {
@@ -354,7 +354,7 @@ class PrivateRecipeApiTests(TestCase):
         self.assertIn(Ingredient2, recipe.ingredients.all())
         self.assertNotIn(Ingredient1, recipe.ingredients.all())
 
-    def tets_clear_recipe_ingredients(self):
+    def test_clear_recipe_ingredients(self):
         """"Test clearing recipe ingredients."""
         ingredient = Ingredient.objects.create(user=self.user, name='Garlic')
         recipe = create_recipe(user=self.user)
@@ -438,7 +438,7 @@ class ImageUploadTests(TestCase):
         self.assertIn('image', res.data)
         self.assertTrue(os.path.exists(self.recipe.image.path))
 
-    def tets_upload_image_bad_request(self):
+    def test_upload_image_bad_request(self):
         """Test uploading invalid image"""
         url = image_upload_url(self.recipe.id)
         payload = {'image': 'notaimage'}
