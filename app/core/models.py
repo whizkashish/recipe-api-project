@@ -1,8 +1,9 @@
 """
-Database model
+Database models.
 """
 import uuid
 import os
+
 from django.conf import settings
 from django.db import models
 from django.contrib.auth.models import (
@@ -13,7 +14,7 @@ from django.contrib.auth.models import (
 
 
 def recipe_image_file_path(instance, filename):
-    """Generate a file path for new recipe page."""
+    """Generate file path for new recipe image."""
     ext = os.path.splitext(filename)[1]
     filename = f'{uuid.uuid4()}{ext}'
 
@@ -21,30 +22,30 @@ def recipe_image_file_path(instance, filename):
 
 
 class UserManager(BaseUserManager):
-    "Manager for users"
+    """Manager for users."""
 
     def create_user(self, email, password=None, **extra_fields):
-        """ Create, save and return a new user """
+        """Create, save and return a new user."""
         if not email:
             raise ValueError('User must have an email address.')
         user = self.model(email=self.normalize_email(email), **extra_fields)
         user.set_password(password)
-        user.save(using=self.db)
+        user.save(using=self._db)
 
         return user
 
     def create_superuser(self, email, password):
-        """Create and return a new superuser"""
+        """Create and return a new superuser."""
         user = self.create_user(email, password)
         user.is_staff = True
         user.is_superuser = True
-        user.save(using=self.db)
+        user.save(using=self._db)
 
         return user
 
 
 class User(AbstractBaseUser, PermissionsMixin):
-    """User in the system"""
+    """User in the system."""
     email = models.EmailField(max_length=255, unique=True)
     name = models.CharField(max_length=255)
     is_active = models.BooleanField(default=True)
@@ -56,7 +57,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 
 class Recipe(models.Model):
-    """Recipe Object"""
+    """Recipe object."""
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
@@ -68,18 +69,18 @@ class Recipe(models.Model):
     link = models.CharField(max_length=255, blank=True)
     tags = models.ManyToManyField('Tag')
     ingredients = models.ManyToManyField('Ingredient')
-    image = models.ImageField(null=True, upload_to='recipe_image_file_path')
+    image = models.ImageField(null=True, upload_to=recipe_image_file_path)
 
     def __str__(self):
         return self.title
 
 
 class Tag(models.Model):
-    """Tag for filteruing recipes."""
+    """Tag for filtering recipes."""
     name = models.CharField(max_length=255)
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
     )
 
     def __str__(self):
@@ -91,7 +92,7 @@ class Ingredient(models.Model):
     name = models.CharField(max_length=255)
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
     )
 
     def __str__(self):
